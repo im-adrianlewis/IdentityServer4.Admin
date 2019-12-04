@@ -101,7 +101,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Controllers
         {
             // check if we are in the context of an authorization request
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
-            _userManager.TenantId = context.Tenant;
+            _userManager.TenantId = context?.Tenant ?? "Immediate";
 
             // the user clicked the "cancel" button
             if (button != "login")
