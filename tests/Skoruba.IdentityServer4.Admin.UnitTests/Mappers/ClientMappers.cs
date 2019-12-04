@@ -20,22 +20,21 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Asert
             clientDto.Should().NotBeNull();
 
-            client.ShouldBeEquivalentTo(clientDto, options =>
+            client.Should().BeEquivalentTo(clientDto, options =>
                 options.Excluding(o => o.AllowedCorsOrigins)
                        .Excluding(o => o.RedirectUris)
                        .Excluding(o => o.PostLogoutRedirectUris)
                        .Excluding(o => o.AllowedGrantTypes)
                        .Excluding(o => o.AllowedScopes)
-					   .Excluding(o => o.Created)
 					   .Excluding(o => o.IdentityProviderRestrictions));
 
             //Assert collection
-            client.AllowedCorsOrigins.Select(x => x.Origin).ShouldBeEquivalentTo(clientDto.AllowedCorsOrigins);
-            client.RedirectUris.Select(x => x.RedirectUri).ShouldBeEquivalentTo(clientDto.RedirectUris);
-            client.PostLogoutRedirectUris.Select(x => x.PostLogoutRedirectUri).ShouldBeEquivalentTo(clientDto.PostLogoutRedirectUris);
-            client.AllowedGrantTypes.Select(x => x.GrantType).ShouldBeEquivalentTo(clientDto.AllowedGrantTypes);
-            client.AllowedScopes.Select(x => x.Scope).ShouldBeEquivalentTo(clientDto.AllowedScopes);
-            client.IdentityProviderRestrictions.Select(x => x.Provider).ShouldBeEquivalentTo(clientDto.IdentityProviderRestrictions);
+            client.AllowedCorsOrigins.Select(x => x.Origin).Should().BeEquivalentTo(clientDto.AllowedCorsOrigins);
+            client.RedirectUris.Select(x => x.RedirectUri).Should().BeEquivalentTo(clientDto.RedirectUris);
+            client.PostLogoutRedirectUris.Select(x => x.PostLogoutRedirectUri).Should().BeEquivalentTo(clientDto.PostLogoutRedirectUris);
+            client.AllowedGrantTypes.Select(x => x.GrantType).Should().BeEquivalentTo(clientDto.AllowedGrantTypes);
+            client.AllowedScopes.Select(x => x.Scope).Should().BeEquivalentTo(clientDto.AllowedScopes);
+            client.IdentityProviderRestrictions.Select(x => x.Provider).Should().BeEquivalentTo(clientDto.IdentityProviderRestrictions);
         }
 
         [Fact]
@@ -49,22 +48,21 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 
             client.Should().NotBeNull();
 
-            client.ShouldBeEquivalentTo(clientDto, options =>
+            client.Should().BeEquivalentTo(clientDto, options =>
                 options.Excluding(o => o.AllowedCorsOrigins)
                     .Excluding(o => o.RedirectUris)
                     .Excluding(o => o.PostLogoutRedirectUris)
                     .Excluding(o => o.AllowedGrantTypes)
                     .Excluding(o => o.AllowedScopes)
-	                .Excluding(o => o.Created)
 					.Excluding(o => o.IdentityProviderRestrictions));
 
             //Assert collection
-            client.AllowedCorsOrigins.Select(x => x.Origin).ShouldBeEquivalentTo(clientDto.AllowedCorsOrigins);
-            client.RedirectUris.Select(x => x.RedirectUri).ShouldBeEquivalentTo(clientDto.RedirectUris);
-            client.PostLogoutRedirectUris.Select(x => x.PostLogoutRedirectUri).ShouldBeEquivalentTo(clientDto.PostLogoutRedirectUris);
-            client.AllowedGrantTypes.Select(x => x.GrantType).ShouldBeEquivalentTo(clientDto.AllowedGrantTypes);
-            client.AllowedScopes.Select(x => x.Scope).ShouldBeEquivalentTo(clientDto.AllowedScopes);
-            client.IdentityProviderRestrictions.Select(x => x.Provider).ShouldBeEquivalentTo(clientDto.IdentityProviderRestrictions);
+            client.AllowedCorsOrigins.Select(x => x.Origin).Should().BeEquivalentTo(clientDto.AllowedCorsOrigins);
+            client.RedirectUris.Select(x => x.RedirectUri).Should().BeEquivalentTo(clientDto.RedirectUris);
+            client.PostLogoutRedirectUris.Select(x => x.PostLogoutRedirectUri).Should().BeEquivalentTo(clientDto.PostLogoutRedirectUris);
+            client.AllowedGrantTypes.Select(x => x.GrantType).Should().BeEquivalentTo(clientDto.AllowedGrantTypes);
+            client.AllowedScopes.Select(x => x.Scope).Should().BeEquivalentTo(clientDto.AllowedScopes);
+            client.IdentityProviderRestrictions.Select(x => x.Provider).Should().BeEquivalentTo(clientDto.IdentityProviderRestrictions);
         }
 
         [Fact]
@@ -77,9 +75,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Assert
             clientClaimsDto.Should().NotBeNull();
 
-            clientClaim.ShouldBeEquivalentTo(clientClaimsDto, options =>
-                options.Excluding(o => o.Id)
-                    .Excluding(o => o.Client));
+            clientClaim.Should().BeEquivalentTo(clientClaimsDto);
         }
 
         [Fact]
@@ -92,9 +88,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Assert
             clientClaim.Should().NotBeNull();
 
-            clientClaim.ShouldBeEquivalentTo(clientClaimDto, options =>
-                options.Excluding(o => o.Id)
-                    .Excluding(o => o.Client));
+            clientClaim.Should().BeEquivalentTo(clientClaimDto);
         }
 
         [Fact]
@@ -107,10 +101,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Assert
             clientSecretsDto.Should().NotBeNull();
 
-            clientSecret.ShouldBeEquivalentTo(clientSecretsDto, options =>
-                options.Excluding(o => o.Id)
-	                .Excluding(o => o.Created)
-					.Excluding(o => o.Client));
+            clientSecret.Should().BeEquivalentTo(clientSecretsDto);
         }
 
         [Fact]
@@ -123,10 +114,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Assert
             clientSecret.Should().NotBeNull();
 
-            clientSecret.ShouldBeEquivalentTo(clientSecretsDto, options =>
-                options.Excluding(o => o.Id)
-	                .Excluding(o => o.Created)
-					.Excluding(o => o.Client));
+            clientSecret.Should().BeEquivalentTo(clientSecretsDto);
         }
 
         [Fact]
@@ -139,9 +127,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Assert
             clientPropertiesDto.Should().NotBeNull();
 
-            clientProperty.ShouldBeEquivalentTo(clientPropertiesDto, options =>
-                options.Excluding(o => o.Id)
-                    .Excluding(o => o.Client));
+            clientProperty.Should().BeEquivalentTo(clientPropertiesDto);
         }
 
         [Fact]
@@ -154,9 +140,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             //Assert
             clientProperty.Should().NotBeNull();
 
-            clientProperty.ShouldBeEquivalentTo(clientPropertiesDto, options =>
-                options.Excluding(o => o.Id)
-                    .Excluding(o => o.Client));
+            clientProperty.Should().BeEquivalentTo(clientPropertiesDto);
         }
     }
 }

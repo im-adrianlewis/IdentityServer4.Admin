@@ -49,6 +49,8 @@ using Skoruba.IdentityServer4.Admin.EntityFramework.MySql.Extensions;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Configuration;
 using Skoruba.IdentityServer4.Admin.EntityFramework.SqlServer.Extensions;
 using Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Entities.Identity;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Services;
 
 namespace Skoruba.IdentityServer4.Admin.Helpers
 {
@@ -437,18 +439,35 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
         /// For testing purpose is used cookie middleware with fake login url.
         /// </summary>
         /// <typeparam name="TContext"></typeparam>
-        /// <typeparam name="TUserIdentity"></typeparam>
-        /// <typeparam name="TUserIdentityRole"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserClaim"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TUserLogin"></typeparam>
+        /// <typeparam name="TUserToken"></typeparam>
+        /// <typeparam name="TRoleClaim"></typeparam>
         /// <param name="services"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="adminConfiguration"></param>
-        public static void AddAuthenticationServices<TContext, TUserIdentity, TUserIdentityRole>(this IServiceCollection services, IWebHostEnvironment hostingEnvironment, IAdminConfiguration adminConfiguration)
-            where TContext : DbContext where TUserIdentity : class where TUserIdentityRole : class
+        public static void AddAuthenticationServices<TContext, TUser, TRole, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim>(
+            this IServiceCollection services, IWebHostEnvironment hostingEnvironment, IAdminConfiguration adminConfiguration)
+            where TContext : DbContext
+            where TUser : UserIdentity
+            where TRole : IdentityRole<string>
+            where TUserClaim : IdentityUserClaim<string>, new()
+            where TUserRole : IdentityUserRole<string>, new()
+            where TUserLogin : IdentityUserLogin<string>, new()
+            where TUserToken : IdentityUserToken<string>, new()
+            where TRoleClaim : IdentityRoleClaim<string>, new()
         {
-            services.AddIdentity<TUserIdentity, TUserIdentityRole>(options =>
-                {
-                    options.User.RequireUniqueEmail = true;
-                })
+            services
+                .AddIdentity<TUser, TRole>(
+                    options =>
+                    {
+                        options.User.RequireUniqueEmail = true;
+                    })
+                .AddUserManager<MultiTenantUserManager>()
+                .AddUserStore<MultiTenantUserStore<TUser, TRole, TContext, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim>>()
                 .AddEntityFrameworkStores<TContext>()
                 .AddDefaultTokenProviders();
 
@@ -553,7 +572,7 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
         private static Task OnRedirectToIdentityProvider(RedirectContext n, IAdminConfiguration adminConfiguration)
         {
             n.ProtocolMessage.RedirectUri = adminConfiguration.IdentityAdminRedirectUri;
-
+            n.ProtocolMessage.AcrValues = "tenant:Immediate";
             return Task.FromResult(0);
         }
     }

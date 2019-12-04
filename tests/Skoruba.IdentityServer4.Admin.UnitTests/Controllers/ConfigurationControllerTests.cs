@@ -82,7 +82,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var client = await dbContext.Clients.Where(x => x.ClientId == clientDto.ClientId).SingleOrDefaultAsync();
             var adddedClient = await clientService.GetClientAsync(client.Id);
 
-            clientDto.ShouldBeEquivalentTo(adddedClient, opts => opts.Excluding(x => x.Id)
+            clientDto.Should().BeEquivalentTo(adddedClient, opts => opts.Excluding(x => x.Id)
                 .Excluding(x => x.AccessTokenTypes)
                 .Excluding(x => x.ProtocolTypes)
                 .Excluding(x => x.RefreshTokenExpirations)
@@ -115,7 +115,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var client = await dbContext.Clients.Where(x => x.ClientId == clientDto.ClientId).SingleOrDefaultAsync();
             var adddedClient = await clientService.GetClientAsync(client.Id);
 
-            clientDto.ShouldBeEquivalentTo(adddedClient, opts => opts.Excluding(x => x.Id)
+            clientDto.Should().BeEquivalentTo(adddedClient, opts => opts.Excluding(x => x.Id)
                 .Excluding(x => x.AccessTokenTypes)
                 .Excluding(x => x.ProtocolTypes)
                 .Excluding(x => x.RefreshTokenExpirations)
@@ -170,7 +170,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var clientClaimAdded = await dbContext.ClientClaims.Where(x => x.Client.Id == clientId).SingleOrDefaultAsync();
             var adddedClientClaim = await clientService.GetClientClaimAsync(clientClaimAdded.Id);
 
-            clientClaim.ShouldBeEquivalentTo(adddedClientClaim, opts => opts.Excluding(x => x.ClientClaimId)
+            clientClaim.Should().BeEquivalentTo(adddedClientClaim, opts => opts.Excluding(x => x.ClientClaimId)
                         .Excluding(x => x.ClientClaims)
                         .Excluding(x => x.ClientName));
         }
@@ -201,7 +201,8 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
 
             var viewModel = Assert.IsType<ClientClaimsDto>(viewResult.ViewData.Model);
             viewModel.ClientClaims.Count.Should().Be(1);
-            viewModel.ClientClaims[0].ShouldBeEquivalentTo(clientClaimAdded);
+            viewModel.ClientClaims[0].Should().BeEquivalentTo(clientClaimAdded,
+                opt => opt.Excluding(x => x.Client).Excluding(x => x.ClientId));
         }
 
         [Fact]
@@ -255,7 +256,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var clientSecretAdded = await dbContext.ClientSecrets.Where(x => x.Client.Id == clientId).SingleOrDefaultAsync();
             var newClientSecret = await clientService.GetClientSecretAsync(clientSecretAdded.Id);
 
-            clientSecret.ShouldBeEquivalentTo(newClientSecret, opts => opts.Excluding(x => x.ClientSecretId)
+            clientSecret.Should().BeEquivalentTo(newClientSecret, opts => opts.Excluding(x => x.ClientSecretId)
                         .Excluding(x => x.ClientSecrets)
                         .Excluding(x => x.ClientName));
         }
@@ -286,7 +287,9 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
 
             var viewModel = Assert.IsType<ClientSecretsDto>(viewResult.ViewData.Model);
             viewModel.ClientSecrets.Count.Should().Be(1);
-            viewModel.ClientSecrets[0].ShouldBeEquivalentTo(clientSecretAdded);
+            viewModel.ClientSecrets[0].Should().BeEquivalentTo(clientSecretAdded, opt => opt
+                .Excluding(x => x.Client)
+                .Excluding(x => x.ClientId));
         }
 
         [Fact]
@@ -340,9 +343,10 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var clientPropertyAdded = await dbContext.ClientProperties.Where(x => x.Client.Id == clientId).SingleOrDefaultAsync();
             var newClientProperty = await clientService.GetClientPropertyAsync(clientPropertyAdded.Id);
 
-            clientProperty.ShouldBeEquivalentTo(newClientProperty, opts => opts.Excluding(x => x.ClientPropertyId)
-                        .Excluding(x => x.ClientProperties)
-                        .Excluding(x => x.ClientName));
+            clientProperty.Should().BeEquivalentTo(newClientProperty, opts => opts
+                .Excluding(x => x.ClientPropertyId)
+                .Excluding(x => x.ClientProperties)
+                .Excluding(x => x.ClientName));
         }
 
         [Fact]
@@ -371,7 +375,9 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
 
             var viewModel = Assert.IsType<ClientPropertiesDto>(viewResult.ViewData.Model);
             viewModel.ClientProperties.Count.Should().Be(1);
-            viewModel.ClientProperties[0].ShouldBeEquivalentTo(clientPropertyAdded);
+            viewModel.ClientProperties[0].Should().BeEquivalentTo(clientPropertyAdded, opt => opt
+                .Excluding(x => x.Client)
+                .Excluding(x => x.ClientId));
         }
 
         [Fact]
@@ -445,7 +451,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var identityResource = await dbContext.IdentityResources.Where(x => x.Name == identityResourceDto.Name).SingleOrDefaultAsync();
             var addedIdentityResource = await identityResourceService.GetIdentityResourceAsync(identityResource.Id);
 
-            identityResourceDto.ShouldBeEquivalentTo(addedIdentityResource, opts => opts.Excluding(x => x.Id));
+            identityResourceDto.Should().BeEquivalentTo(addedIdentityResource, opts => opts.Excluding(x => x.Id));
         }
 
         [Fact]
@@ -497,7 +503,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var apiResource = await dbContext.ApiResources.Where(x => x.Name == apiResourceDto.Name).SingleOrDefaultAsync();
             var addedApiResource = await apiResourceService.GetApiResourceAsync(apiResource.Id);
 
-            apiResourceDto.ShouldBeEquivalentTo(addedApiResource, opts => opts.Excluding(x => x.Id));
+            apiResourceDto.Should().BeEquivalentTo(addedApiResource, opts => opts.Excluding(x => x.Id));
         }
 
         [Fact]
@@ -551,7 +557,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var apiScope = await dbContext.ApiScopes.Where(x => x.Name == apiScopeDto.Name).SingleOrDefaultAsync();
             var addedApiScope = await apiResourceService.GetApiScopeAsync(resource.Id, apiScope.Id);
 
-            apiScopeDto.ShouldBeEquivalentTo(addedApiScope, opts => opts.Excluding(x => x.ApiResourceId).Excluding(x => x.ResourceName).Excluding(x => x.ApiScopeId));
+            apiScopeDto.Should().BeEquivalentTo(addedApiScope, opts => opts.Excluding(x => x.ApiResourceId).Excluding(x => x.ResourceName).Excluding(x => x.ApiScopeId));
         }
 
         [Fact]
@@ -622,7 +628,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var apiScope = await dbContext.ApiScopes.Where(x => x.Id == apiScopeAdded.Id).SingleOrDefaultAsync();
             var addedApiScope = await apiResourceService.GetApiScopeAsync(resource.Id, apiScope.Id);
 
-            updatedApiScopeDto.ShouldBeEquivalentTo(addedApiScope, opts => opts.Excluding(x => x.ApiResourceId)
+            updatedApiScopeDto.Should().BeEquivalentTo(addedApiScope, opts => opts.Excluding(x => x.ApiResourceId)
                 .Excluding(x => x.ResourceName)
                 .Excluding(x => x.ApiScopeId));
         }
@@ -716,7 +722,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
             var apiSecret = await dbContext.ApiSecrets.Where(x => x.Value == apiSecretsDto.Value).SingleOrDefaultAsync();
             var addedApiScope = await apiResourceService.GetApiSecretAsync(apiSecret.Id);
 
-            apiSecretsDto.ShouldBeEquivalentTo(addedApiScope, opts => opts.Excluding(x => x.ApiResourceId).Excluding(x => x.ApiResourceName).Excluding(x => x.ApiSecretId));
+            apiSecretsDto.Should().BeEquivalentTo(addedApiScope, opts => opts.Excluding(x => x.ApiResourceId).Excluding(x => x.ApiResourceName).Excluding(x => x.ApiSecretId));
         }
 
         [Fact]
@@ -807,7 +813,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Controllers
                 .AddDefaultEventData()
                 .AddAuditSinks<DatabaseAuditEventLoggerSink<AuditLog>>();
             services.AddTransient<IAuditLoggingRepository<AuditLog>, AuditLoggingRepository<AdminAuditLogDbContext, AuditLog>>();
-            
+
             //Add Admin services
             services.AddMvcExceptionFilters();
 

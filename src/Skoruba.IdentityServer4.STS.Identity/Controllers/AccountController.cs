@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Entities.Identity;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Services;
 using Skoruba.IdentityServer4.STS.Identity.Configuration;
 using Skoruba.IdentityServer4.STS.Identity.Helpers;
 using Skoruba.IdentityServer4.STS.Identity.Helpers.Localization;
@@ -30,37 +32,35 @@ namespace Skoruba.IdentityServer4.STS.Identity.Controllers
 {
     [SecurityHeaders]
     [Authorize]
-    public class AccountController<TUser, TKey> : Controller
-        where TUser : IdentityUser<TKey>, new()
-        where TKey : IEquatable<TKey>
+    public class AccountController : Controller
     {
-        private readonly UserResolver<TUser> _userResolver;
-        private readonly UserManager<TUser> _userManager;
-        private readonly SignInManager<TUser> _signInManager;
+        private readonly UserResolver<UserIdentity> _userResolver;
+        private readonly MultiTenantUserManager _userManager;
+        private readonly SignInManager<UserIdentity> _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
         private readonly IEmailSender _emailSender;
-        private readonly IGenericControllerLocalizer<AccountController<TUser, TKey>> _localizer;
+        private readonly IGenericControllerLocalizer<AccountController> _localizer;
         private readonly LoginConfiguration _loginConfiguration;
         private readonly RegisterConfiguration _registerConfiguration;
 
         public AccountController(
-            UserResolver<TUser> userResolver,
-            UserManager<TUser> userManager,
-            SignInManager<TUser> signInManager,
+            UserResolver<UserIdentity> userResolver,
+            UserManager<UserIdentity> userManager,
+            SignInManager<UserIdentity> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
             IEmailSender emailSender,
-            IGenericControllerLocalizer<AccountController<TUser, TKey>> localizer,
+            IGenericControllerLocalizer<AccountController> localizer,
             LoginConfiguration loginConfiguration,
             RegisterConfiguration registerConfiguration)
         {
             _userResolver = userResolver;
-            _userManager = userManager;
+            _userManager = (MultiTenantUserManager)userManager;
             _signInManager = signInManager;
             _interaction = interaction;
             _clientStore = clientStore;
@@ -101,6 +101,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Controllers
         {
             // check if we are in the context of an authorization request
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+            _userManager.TenantId = context.Tenant;
 
             // the user clicked the "cancel" button
             if (button != "login")
@@ -130,7 +131,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userResolver.GetUserAsync(model.Username);
-                if (user != default(TUser))
+                if (user != default(UserIdentity))
                 {
                     var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberLogin, lockoutOnFailure: true);
                     if (result.Succeeded)
@@ -404,7 +405,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = new TUser
+                var user = new UserIdentity
                 {
                     UserName = model.UserName,
                     Email = model.Email
@@ -570,7 +571,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            var user = new TUser
+            var user = new UserIdentity
             {
                 UserName = model.UserName,
                 Email = model.Email

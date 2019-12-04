@@ -20,18 +20,14 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 			//Assert
 			apiResourceDto.Should().NotBeNull();
 
-			apiResource.ShouldBeEquivalentTo(apiResourceDto, options =>
-				options.Excluding(o => o.Secrets)
-					   .Excluding(o => o.Scopes)
-					   .Excluding(o => o.Properties)
-					   .Excluding(o => o.Created)
-					   .Excluding(o => o.Updated)
-					   .Excluding(o => o.LastAccessed)
-					   .Excluding(o => o.NonEditable)
-					   .Excluding(o => o.UserClaims));
+			apiResource.Should().BeEquivalentTo(apiResourceDto, opt => opt
+                .Excluding(x => x.UserClaimsItems)
+                .Excluding(x => x.UserClaims));
 
 			//Assert collection
-			apiResource.UserClaims.Select(x => x.Type).ShouldBeEquivalentTo(apiResourceDto.UserClaims);
+			apiResource.UserClaims
+                .Select(x => x.Type)
+                .Should().BeEquivalentTo(apiResourceDto.UserClaims);
 		}
 
 		[Fact]
@@ -45,18 +41,12 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 
 			apiResource.Should().NotBeNull();
 
-			apiResource.ShouldBeEquivalentTo(apiResourceDto, options =>
-				options.Excluding(o => o.Secrets)
-					.Excluding(o => o.Scopes)
-					.Excluding(o => o.Properties)
-					.Excluding(o => o.Created)
-					.Excluding(o => o.Updated)
-					.Excluding(o => o.LastAccessed)
-					.Excluding(o => o.NonEditable)
-					.Excluding(o => o.UserClaims));
+			apiResource.Should().BeEquivalentTo(apiResourceDto, opt => opt
+                .Excluding(x => x.UserClaimsItems)
+                .Excluding(x => x.UserClaims));
 
 			//Assert collection
-			apiResource.UserClaims.Select(x => x.Type).ShouldBeEquivalentTo(apiResourceDto.UserClaims);
+			apiResource.UserClaims.Select(x => x.Type).Should().BeEquivalentTo(apiResourceDto.UserClaims);
 		}
 
 		[Fact]
@@ -71,18 +61,12 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 			//Asert
 			apiResourceDto.Should().NotBeNull();
 
-			apiResource.ShouldBeEquivalentTo(apiResourceDto, options =>
-				options.Excluding(o => o.Secrets)
-					.Excluding(o => o.Scopes)
-					.Excluding(o => o.Properties)
-					.Excluding(o => o.Created)
-					.Excluding(o => o.Updated)
-					.Excluding(o => o.LastAccessed)
-					.Excluding(o => o.NonEditable)
-					.Excluding(o => o.UserClaims));
+			apiResource.Should().BeEquivalentTo(apiResourceDto, opt => opt
+                .Excluding(x => x.UserClaimsItems)
+                .Excluding(x => x.UserClaims));
 
 			//Assert collection
-			apiResource.UserClaims.Select(x => x.Type).ShouldBeEquivalentTo(apiResourceDto.UserClaims);
+			apiResource.UserClaims.Select(x => x.Type).Should().BeEquivalentTo(apiResourceDto.UserClaims);
 		}
 
 		[Fact]
@@ -96,13 +80,17 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 
 			apiScope.Should().NotBeNull();
 
-			apiScope.ShouldBeEquivalentTo(apiScopeDto, options =>
+			apiScope.Should().BeEquivalentTo(apiScopeDto, options =>
 				options.Excluding(o => o.UserClaims)
-					   .Excluding(o => o.ApiResource)
-					   .Excluding(o => o.Id));
+                    .Excluding(o=>o.ResourceName)
+                    .Excluding(o=>o.ApiScopeId)
+                    .Excluding(o=>o.PageSize)
+                    .Excluding(o => o.TotalCount)
+                    .Excluding(o => o.Scopes)
+                    .Excluding(o => o.UserClaimsItems));
 
 			//Assert collection
-			apiScope.UserClaims.Select(x => x.Type).ShouldBeEquivalentTo(apiScopeDto.UserClaims);
+			apiScope.UserClaims.Select(x => x.Type).Should().BeEquivalentTo(apiScopeDto.UserClaims);
 			apiScope.Id.Should().Be(apiScopeDto.ApiScopeId);
 		}
 
@@ -118,10 +106,15 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 			//Assert
 			apiSecretsDto.Should().NotBeNull();
 
-			apiSecret.ShouldBeEquivalentTo(apiSecretsDto, options =>
-				options.Excluding(o => o.ApiResource)
-					.Excluding(o => o.Created)
-					.Excluding(o => o.Id));
+			apiSecret.Should().BeEquivalentTo(apiSecretsDto, opts => opts
+                .Excluding(o => o.ApiSecretId)
+                .Excluding(o => o.ApiResourceName)
+                .Excluding(o => o.TypeList)
+                .Excluding(o => o.HashType)
+                .Excluding(o => o.HashTypes)
+                .Excluding(o => o.TotalCount)
+                .Excluding(o => o.PageSize)
+                .Excluding(o => o.ApiSecrets));
 
 			apiSecret.Id.Should().Be(apiSecretsDto.ApiSecretId);
 		}
@@ -137,10 +130,15 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
 
 			apiSecret.Should().NotBeNull();
 
-			apiSecret.ShouldBeEquivalentTo(apiSecretsDto, options =>
-				options.Excluding(o => o.ApiResource)
-					.Excluding(o => o.Created)
-					.Excluding(o => o.Id));
+			apiSecret.Should().BeEquivalentTo(apiSecretsDto, opts => opts
+                .Excluding(o => o.ApiSecretId)
+                .Excluding(o => o.ApiResourceName)
+                .Excluding(o => o.TypeList)
+                .Excluding(o => o.HashType)
+                .Excluding(o => o.HashTypes)
+                .Excluding(o => o.TotalCount)
+                .Excluding(o => o.PageSize)
+                .Excluding(o => o.ApiSecrets));
 
 			apiSecret.Id.Should().Be(apiSecretsDto.ApiSecretId);
 		}

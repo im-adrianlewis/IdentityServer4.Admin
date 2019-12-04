@@ -30,7 +30,9 @@ using Skoruba.IdentityServer4.Admin.EntityFramework.Interfaces;
 using Skoruba.IdentityServer4.Admin.EntityFramework.MySql.Extensions;
 using Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Configuration;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Services;
 using Skoruba.IdentityServer4.Admin.EntityFramework.SqlServer.Extensions;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Entities.Identity;
 
 namespace Skoruba.IdentityServer4.STS.Identity.Helpers
 {
@@ -236,8 +238,8 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         public static void AddAuthenticationServices<TConfigurationDbContext, TPersistedGrantDbContext, TIdentityDbContext, TUserIdentity, TUserIdentityRole>(this IServiceCollection services, IConfiguration configuration, ILogger logger) where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
-            where TUserIdentity : class
-            where TUserIdentityRole : class
+            where TUserIdentity : UserIdentity
+            where TUserIdentityRole : IdentityRole<string>
         {
             var loginConfiguration = GetLoginConfiguration(configuration);
             var registrationConfiguration = GetRegistrationConfiguration(configuration);
@@ -250,6 +252,8 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
                 {
                     options.User.RequireUniqueEmail = true;
                 })
+                .AddUserManager<MultiTenantUserManager>()
+                .AddUserStore<MultiTenantUserStore<TUserIdentity, TUserIdentityRole, TIdentityDbContext, UserIdentityUserClaim, UserIdentityUserRole, UserIdentityUserLogin, UserIdentityUserToken, UserIdentityRoleClaim>>()
                 .AddEntityFrameworkStores<TIdentityDbContext>()
                 .AddDefaultTokenProviders();
 
