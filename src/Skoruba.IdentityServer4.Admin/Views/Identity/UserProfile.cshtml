@@ -75,7 +75,7 @@
                         </div>
                     </div>
 
-                    <!--Checkbox-->
+                    <!--Input - checkbox -->
                     <div class="form-group row">
                         <label asp-for="EmailConfirmed" class="col-sm-3 col-form-label">
                             @await Html.PartialAsync("User/Section/Label", "UserEmailConfirmed")
@@ -97,7 +97,7 @@
                         </div>
                     </div>
 
-                    <!--Checkbox-->
+                    <!--Input - checkbox -->
                     <div class="form-group row">
                         <label asp-for="PhoneNumberConfirmed" class="col-sm-3 col-form-label">
                             @await Html.PartialAsync("User/Section/Label", "UserPhoneNumberConfirmed")
@@ -109,7 +109,7 @@
                         </div>
                     </div>
 
-                    <!--Checkbox-->
+                    <!--Input - checkbox -->
                     <div class="form-group row">
                         <label asp-for="LockoutEnabled" class="col-sm-3 col-form-label">
                             @await Html.PartialAsync("User/Section/Label", "UserLockoutEnabled")
@@ -121,7 +121,7 @@
                         </div>
                     </div>
 
-                    <!--Checkbox-->
+                    <!--Input - checkbox -->
                     <div class="form-group row">
                         <label asp-for="TwoFactorEnabled" class="col-sm-3 col-form-label">
                             @await Html.PartialAsync("User/Section/Label", "UserTwoFactorEnabled")
@@ -143,15 +143,75 @@
                         </div>
                     </div>
 
-                    <!--Input - text -->
+                    <!--Input - date -->
                     <div class="form-group row">
                         <label asp-for="LockoutEnd" class="col-sm-3 col-form-label">
                             @await Html.PartialAsync("User/Section/Label", "UserLockoutEnd")
                         </label>
                         <div class="col-sm-9">
-                            <div class="input-group date" id="logoutend-picker" data-target-input="nearest">
+                            <div class="input-group date" id="lockoutend-picker" data-target-input="nearest">
                                 <input asp-for="LockoutEnd" type="text" class="form-control">
-                                <div class="input-group-append" data-target="#logoutend-picker" data-toggle="datetimepicker">
+                                <div class="input-group-append" data-target="#lockoutend-picker" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Input - text -->
+                    <div class="form-group row">
+                        <label asp-for="TenantId" class="col-sm-3 col-form-label">
+                            @await Html.PartialAsync("User/Section/Label", "UserTenantId")
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="TenantId">
+                        </div>
+                    </div>
+
+                    <!--Input - text -->
+                    <div class="form-group row">
+                        <label asp-for="FirstName" class="col-sm-3 col-form-label">
+                            @await Html.PartialAsync("User/Section/Label", "UserFirstName")
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="FirstName">
+                        </div>
+                    </div>
+
+                    <!--Input - text -->
+                    <div class="form-group row">
+                        <label asp-for="LastName" class="col-sm-3 col-form-label">
+                            @await Html.PartialAsync("User/Section/Label", "UserLastName")
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="LastName">
+                        </div>
+                    </div>
+
+                    <!--Input - date -->
+                    <div class="form-group row">
+                        <label asp-for="RegistrationDate" class="col-sm-3 col-form-label">
+                            @await Html.PartialAsync("User/Section/Label", "UserRegistrationDate")
+                        </label>
+                        <div class="col-sm-9">
+                            <div class="input-group date" id="registrationdate-picker" data-target-input="nearest">
+                                <input asp-for="RegistrationDate" type="text" class="form-control">
+                                <div class="input-group-append" data-target="#registrationdate-picker" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Input - date -->
+                    <div class="form-group row">
+                        <label asp-for="CreateDate" class="col-sm-3 col-form-label">
+                            @await Html.PartialAsync("User/Section/Label", "UserCreateDate")
+                        </label>
+                        <div class="col-sm-9">
+                            <div class="input-group date" id="createdate-picker" data-target-input="nearest">
+                                <input asp-for="CreateDate" type="text" class="form-control">
+                                <div class="input-group-append" data-target="#createdate-picker" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
                             </div>

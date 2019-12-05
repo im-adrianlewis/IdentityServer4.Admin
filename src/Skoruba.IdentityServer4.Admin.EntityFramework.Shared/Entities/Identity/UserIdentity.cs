@@ -18,7 +18,7 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Entities.Identity
 
         public virtual string UserType { get; set; }
 
-        public string AuthenticationType { get; set; }
+        public virtual string AuthenticationType { get; set; }
 
         public virtual DateTimeOffset? LastLoggedInDate { get; set; }
 
