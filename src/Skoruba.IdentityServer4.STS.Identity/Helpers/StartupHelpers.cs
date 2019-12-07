@@ -138,21 +138,23 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         /// <typeparam name="TConfigurationDbContext"></typeparam>
         /// <typeparam name="TPersistedGrantDbContext"></typeparam>
         /// <typeparam name="TIdentityDbContext"></typeparam>
+        /// <typeparam name="TTenantConfigDbContext"></typeparam>
         /// <param name="services"></param>
         /// <param name="environment"></param>
         /// <param name="configuration"></param>
-        public static void RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(this IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration)
+        public static void RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(this IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration)
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
         {
             if (environment.IsStaging())
             {
-                services.RegisterDbContextsInMemory<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>();
+                services.RegisterDbContextsInMemory<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>();
             }
             else
             {
-                services.RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(configuration);
+                services.RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext > (configuration);
             }
         }
 
@@ -164,29 +166,32 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         /// <typeparam name="TConfigurationDbContext"></typeparam>
         /// <typeparam name="TPersistedGrantDbContext"></typeparam>
         /// <typeparam name="TIdentityDbContext"></typeparam>
+        /// <typeparam name="TTenantConfigDbContext"></typeparam>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
-        public static void RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(this IServiceCollection services, IConfiguration configuration)
+        public static void RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(this IServiceCollection services, IConfiguration configuration)
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
         {
             var databaseProvider = configuration.GetSection(nameof(DatabaseProviderConfiguration)).Get<DatabaseProviderConfiguration>();
             
             var identityConnectionString = configuration.GetConnectionString(ConfigurationConsts.IdentityDbConnectionStringKey);
             var configurationConnectionString = configuration.GetConnectionString(ConfigurationConsts.ConfigurationDbConnectionStringKey);
             var persistedGrantsConnectionString = configuration.GetConnectionString(ConfigurationConsts.PersistedGrantDbConnectionStringKey);
+            var tenantConfigConnectionString = configuration.GetConnectionString(ConfigurationConsts.AdminTenantConfigDbConnectionStringKey);
 
             switch (databaseProvider.ProviderType)
             {
                 case DatabaseProviderType.SqlServer:
-                    services.RegisterSqlServerDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(identityConnectionString, configurationConnectionString, persistedGrantsConnectionString);
+                    services.RegisterSqlServerDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(identityConnectionString, configurationConnectionString, persistedGrantsConnectionString, tenantConfigConnectionString);
                     break;
                 case DatabaseProviderType.PostgreSQL:
-                    services.RegisterNpgSqlDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(identityConnectionString, configurationConnectionString, persistedGrantsConnectionString);
+                    services.RegisterNpgSqlDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(identityConnectionString, configurationConnectionString, persistedGrantsConnectionString, tenantConfigConnectionString);
                     break;
                 case DatabaseProviderType.MySql:
-                    services.RegisterMySqlDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(identityConnectionString, configurationConnectionString, persistedGrantsConnectionString);
+                    services.RegisterMySqlDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(identityConnectionString, configurationConnectionString, persistedGrantsConnectionString, tenantConfigConnectionString);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(databaseProvider.ProviderType), $@"The value needs to be one of {string.Join(", ", Enum.GetNames(typeof(DatabaseProviderType)))}.");
@@ -200,18 +205,22 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         /// <typeparam name="TConfigurationDbContext"></typeparam>
         /// <typeparam name="TPersistedGrantDbContext"></typeparam>
         /// <typeparam name="TIdentityDbContext"></typeparam>
+        /// <typeparam name="TTenantConfigDbContext"></typeparam>
         /// <param name="services"></param>
-        public static void RegisterDbContextsInMemory<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext>(
+        public static void RegisterDbContextsInMemory<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(
             this IServiceCollection services)
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
         {
             var identityDatabaseName = Guid.NewGuid().ToString();
-            services.AddDbContext<TIdentityDbContext>(optionsBuilder => optionsBuilder.UseInMemoryDatabase(identityDatabaseName));
-
             var configurationDatabaseName = Guid.NewGuid().ToString();
             var operationalDatabaseName = Guid.NewGuid().ToString();
+            var tenantConfigDatabaseName = Guid.NewGuid().ToString();
+
+            services.AddDbContext<TIdentityDbContext>(optionsBuilder =>
+                optionsBuilder.UseInMemoryDatabase(identityDatabaseName));
 
             services.AddConfigurationDbContext<TConfigurationDbContext>(options =>
             {
@@ -222,6 +231,9 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
             {
                 options.ConfigureDbContext = b => b.UseInMemoryDatabase(operationalDatabaseName);
             });
+
+            services.AddDbContext<TTenantConfigDbContext>(optionsBuilder =>
+                optionsBuilder.UseInMemoryDatabase(tenantConfigDatabaseName));
         }
 
         /// <summary>

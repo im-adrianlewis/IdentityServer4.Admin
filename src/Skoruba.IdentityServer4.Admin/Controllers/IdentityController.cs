@@ -146,11 +146,35 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
 
             if (EqualityComparer<TUserDtoKey>.Default.Equals(user.Id, default))
             {
-                var userData = await _identityService.CreateUserAsync(user);
-                userId = userData.userId;
+                // Override DTO variables
+                user.RegistrationIpAddress = GetCallerIpAddress();
+                user.RegistrationDate = user.LastUpdatedDate = DateTimeOffset.UtcNow;
+                if (string.IsNullOrEmpty(user.ScreenName))
+                {
+                    //user.ScreenName = _screenNameGenerator.Create(user.Email);
+                }
+
+                while (true)
+                {
+                    try
+                    {
+                        var userData = await _identityService.CreateUserAsync(user);
+                        userId = userData.userId;
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        // Assume failure is due to borked screen name so try again
+                        //user.ScreenName = _screenNameGenerator.Create(user.ScreenName);
+                    }
+                }
+
             }
             else
             {
+                // Override DTO variables
+                user.LastUpdatedDate = DateTimeOffset.UtcNow;
+
                 var userData = await _identityService.UpdateUserAsync(user);
                 userId = userData.userId;
             }
@@ -158,6 +182,23 @@ namespace Skoruba.IdentityServer4.Admin.Controllers
             SuccessNotification(string.Format(_localizer["SuccessCreateUser"], user.UserName), _localizer["SuccessTitle"]);
 
             return RedirectToAction(nameof(UserProfile), new { Id = userId });
+        }
+
+        private string GetCallerIpAddress()
+        {
+            var callerIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+            var proxies = Request.Headers["X-Forwarded-For"];
+            if (proxies.Any())
+            {
+                callerIpAddress = proxies.First();
+            }
+
+            if (callerIpAddress == "::1")
+            {
+                callerIpAddress = "127.0.0.1";
+            }
+
+            return callerIpAddress;
         }
 
         [HttpGet]

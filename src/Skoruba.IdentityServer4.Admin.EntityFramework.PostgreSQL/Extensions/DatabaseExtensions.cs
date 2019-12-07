@@ -20,22 +20,29 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions
         /// <typeparam name="TLogDbContext"></typeparam>
         /// <typeparam name="TIdentityDbContext"></typeparam>
         /// <typeparam name="TAuditLoggingDbContext"></typeparam>
+        /// <typeparam name="TTenantConfigDbContext"></typeparam>
         /// <param name="services"></param>
         /// <param name="identityConnectionString"></param>
         /// <param name="configurationConnectionString"></param>
         /// <param name="persistedGrantConnectionString"></param>
         /// <param name="errorLoggingConnectionString"></param>
         /// <param name="auditLoggingConnectionString"></param>
+        /// <param name="tenantConfigConnectionString"></param>
         public static void RegisterNpgSqlDbContexts<TIdentityDbContext, TConfigurationDbContext,
-            TPersistedGrantDbContext, TLogDbContext, TAuditLoggingDbContext>(this IServiceCollection services,
-            string identityConnectionString, string configurationConnectionString,
-            string persistedGrantConnectionString, string errorLoggingConnectionString,
-            string auditLoggingConnectionString)
+            TPersistedGrantDbContext, TLogDbContext, TAuditLoggingDbContext, TTenantConfigDbContext>(
+            this IServiceCollection services,
+            string identityConnectionString,
+            string configurationConnectionString,
+            string persistedGrantConnectionString,
+            string errorLoggingConnectionString,
+            string auditLoggingConnectionString,
+            string tenantConfigConnectionString)
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
             where TLogDbContext : DbContext, IAdminLogDbContext
             where TAuditLoggingDbContext : DbContext, IAuditLoggingDbContext<AuditLog>
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
         {
             var migrationsAssembly = typeof(DatabaseExtensions).GetTypeInfo().Assembly.GetName().Name;
 
@@ -59,6 +66,10 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions
             // Audit logging connection
             services.AddDbContext<TAuditLoggingDbContext>(options => options.UseNpgsql(auditLoggingConnectionString,
                 optionsSql => optionsSql.MigrationsAssembly(migrationsAssembly)));
+
+            // Config DB for multi-tenant support
+            services.AddDbContext<TTenantConfigDbContext>(options => options.UseNpgsql(tenantConfigConnectionString,
+                optionsSql => optionsSql.MigrationsAssembly(migrationsAssembly)));
         }
 
         /// <summary>
@@ -68,17 +79,23 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions
         /// <typeparam name="TConfigurationDbContext"></typeparam>
         /// <typeparam name="TPersistedGrantDbContext"></typeparam>
         /// <typeparam name="TIdentityDbContext"></typeparam>
+        /// <typeparam name="TTenantConfigDbContext"></typeparam>
         /// <param name="services"></param>
         /// <param name="identityConnectionString"></param>
         /// <param name="configurationConnectionString"></param>
         /// <param name="persistedGrantConnectionString"></param>
+        /// <param name="tenantConfigConnectionString"></param>
         public static void RegisterNpgSqlDbContexts<TIdentityDbContext, TConfigurationDbContext,
-            TPersistedGrantDbContext>(this IServiceCollection services,
-            string identityConnectionString, string configurationConnectionString,
-            string persistedGrantConnectionString)
+            TPersistedGrantDbContext, TTenantConfigDbContext>(
+            this IServiceCollection services,
+            string identityConnectionString,
+            string configurationConnectionString,
+            string persistedGrantConnectionString,
+            string tenantConfigConnectionString)
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
         {
             var migrationsAssembly = typeof(DatabaseExtensions).GetTypeInfo().Assembly.GetName().Name;
 
@@ -90,6 +107,10 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions
 
             // Operational DB from existing connection
             services.AddOperationalDbContext<TPersistedGrantDbContext>(options => options.ConfigureDbContext = b => b.UseNpgsql(persistedGrantConnectionString, sql => sql.MigrationsAssembly(migrationsAssembly)));
+
+            // Config DB for multi-tenant support
+            services.AddDbContext<TTenantConfigDbContext>(options => options.UseNpgsql(tenantConfigConnectionString,
+                optionsSql => optionsSql.MigrationsAssembly(migrationsAssembly)));
         }
     }
 }

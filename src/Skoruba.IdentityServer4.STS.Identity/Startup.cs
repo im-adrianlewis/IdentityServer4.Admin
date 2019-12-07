@@ -30,7 +30,7 @@ namespace Skoruba.IdentityServer4.STS.Identity
             services.AddSingleton<IRootConfiguration>(rootConfiguration);
 
             // Register DbContexts for IdentityServer and Identity
-            services.RegisterDbContexts<AdminIdentityDbContext, IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext>(Environment, Configuration);
+            services.RegisterDbContexts<AdminIdentityDbContext, IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminTenantConfigDbContext>(Environment, Configuration);
 
             // Add email senders which is currently setup for SendGrid and SMTP
             services.AddEmailSenders(Configuration);
