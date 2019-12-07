@@ -36,7 +36,7 @@ namespace Skoruba.IdentityServer4.STS.Identity
             services.AddEmailSenders(Configuration);
 
             // Add services for authentication, including Identity model, IdentityServer4 and external providers
-            services.AddAuthenticationServices<IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminIdentityDbContext, UserIdentity, UserIdentityRole>(Configuration);
+            services.AddAuthenticationServices<IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminIdentityDbContext, AdminTenantConfigDbContext, UserIdentity, UserIdentityRole>(Configuration);
 
             // Add all dependencies for Asp.Net Core Identity in MVC - these dependencies are injected into generic Controllers
             // Including settings for MVC and Localization

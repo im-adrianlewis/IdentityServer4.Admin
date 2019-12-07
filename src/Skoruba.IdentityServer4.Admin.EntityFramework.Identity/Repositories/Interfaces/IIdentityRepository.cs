@@ -70,7 +70,6 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.Identity.Repositories.In
 
 		Task<PagedList<TRoleClaim>> GetUserRoleClaimsAsync(string userId, string claimSearchText, int page = 1, int pageSize = 10);
 
-
 		Task<TRoleClaim> GetRoleClaimAsync(string roleId, int claimId);
 
         Task<int> DeleteRoleClaimsAsync(string roleId, int claimId);

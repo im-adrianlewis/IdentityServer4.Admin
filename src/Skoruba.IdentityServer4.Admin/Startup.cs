@@ -52,7 +52,7 @@ namespace Skoruba.IdentityServer4.Admin
             services.AddMvcExceptionFilters();
 
             // Add all dependencies for IdentityServer Admin
-            services.AddAdminServices<IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminLogDbContext>();
+            services.AddAdminServices<IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminLogDbContext, AdminTenantConfigDbContext>();
 
             // Add all dependencies for Asp.Net Core Identity
             // If you want to change primary keys or use another db model for Asp.Net Core Identity:

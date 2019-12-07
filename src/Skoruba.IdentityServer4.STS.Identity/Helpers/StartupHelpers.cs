@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using IdentityServer4.EntityFramework.Storage;
 using Microsoft.AspNetCore.Authentication;
@@ -26,6 +27,7 @@ using Skoruba.IdentityServer4.STS.Identity.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using System.Linq;
 using Microsoft.Extensions.Hosting;
+using Skoruba.IdentityServer4.Admin.EntityFramework.Entities;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Interfaces;
 using Skoruba.IdentityServer4.Admin.EntityFramework.MySql.Extensions;
 using Skoruba.IdentityServer4.Admin.EntityFramework.PostgreSQL.Extensions;
@@ -154,7 +156,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
             }
             else
             {
-                services.RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext > (configuration);
+                services.RegisterDbContexts<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext>(configuration);
             }
         }
 
@@ -176,7 +178,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
             where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
         {
             var databaseProvider = configuration.GetSection(nameof(DatabaseProviderConfiguration)).Get<DatabaseProviderConfiguration>();
-            
+
             var identityConnectionString = configuration.GetConnectionString(ConfigurationConsts.IdentityDbConnectionStringKey);
             var configurationConnectionString = configuration.GetConnectionString(ConfigurationConsts.ConfigurationDbConnectionStringKey);
             var persistedGrantsConnectionString = configuration.GetConnectionString(ConfigurationConsts.PersistedGrantDbConnectionStringKey);
@@ -244,11 +246,14 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         /// <typeparam name="TUserIdentityRole">User Identity Role class</typeparam>
         /// <typeparam name="TConfigurationDbContext"></typeparam>
         /// <typeparam name="TPersistedGrantDbContext"></typeparam>
+        /// <typeparam name="TTenantConfigDbContext"></typeparam>
         /// <param name="services"></param>
         /// <param name="configuration"></param>
-        public static void AddAuthenticationServices<TConfigurationDbContext, TPersistedGrantDbContext, TIdentityDbContext, TUserIdentity, TUserIdentityRole>(this IServiceCollection services, IConfiguration configuration) where TIdentityDbContext : DbContext
+        public static void AddAuthenticationServices<TConfigurationDbContext, TPersistedGrantDbContext, TIdentityDbContext, TTenantConfigDbContext, TUserIdentity, TUserIdentityRole>(this IServiceCollection services, IConfiguration configuration) 
+            where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
             where TUserIdentity : UserIdentity
             where TUserIdentityRole : IdentityRole<string>
         {
@@ -277,6 +282,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
             var authenticationBuilder = services.AddAuthentication();
 
             AddExternalProviders(authenticationBuilder, configuration);
+            AddMultiTenantExternalProviders<TTenantConfigDbContext>(authenticationBuilder, services);
 
             AddIdentityServer<TConfigurationDbContext, TPersistedGrantDbContext, TUserIdentity>(services, configuration);
         }
@@ -352,7 +358,8 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         /// </summary>
         /// <param name="authenticationBuilder"></param>
         /// <param name="configuration"></param>
-        private static void AddExternalProviders(AuthenticationBuilder authenticationBuilder,
+        private static void AddExternalProviders(
+            AuthenticationBuilder authenticationBuilder,
             IConfiguration configuration)
         {
             var externalProviderConfiguration = configuration.GetSection(nameof(ExternalProvidersConfiguration)).Get<ExternalProvidersConfiguration>();
@@ -365,6 +372,83 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
                     options.ClientSecret = externalProviderConfiguration.GitHubClientSecret;
                     options.Scope.Add("user:email");
                 });
+            }
+        }
+
+        private static void AddMultiTenantExternalProviders<TTenantConfigurationDbContext>(
+            AuthenticationBuilder authenticationBuilder, IServiceCollection services)
+            where TTenantConfigurationDbContext : DbContext, IAdminTenantConfigDbContext
+        {
+            var providerFactory = new DefaultServiceProviderFactory();
+            var sp = providerFactory.CreateServiceProvider(services);
+            try
+            {
+                var context = sp.GetRequiredService<TTenantConfigurationDbContext>();
+                var externalProviders = context
+                    .ExternalProviders
+                    .Where(e => e.Enabled)
+                    .ToList();
+
+                AddFacebookProviders(authenticationBuilder, externalProviders.Where(e => e.Caption == "Facebook"));
+                AddGoogleProviders(authenticationBuilder, externalProviders.Where(e => e.Caption == "Google"));
+                AddTwitterProviders(authenticationBuilder, externalProviders.Where(e => e.Caption == "Twitter"));
+            }
+            finally
+            {
+                var disp = sp as IDisposable;
+                disp?.Dispose();
+            }
+        }
+
+        private static void AddFacebookProviders(AuthenticationBuilder authenticationBuilder, IEnumerable<ExternalProvider> externalProviders)
+        {
+            // TODO: Add code to handle failures
+            foreach (var externalProvider in externalProviders)
+            {
+                authenticationBuilder.AddFacebook(
+                    externalProvider.AuthenticationType,
+                    options =>
+                    {
+                        options.AppId = externalProvider.ConsumerKey;
+                        options.AppSecret = externalProvider.Secret;
+                        options.CallbackPath = externalProvider.Callback;
+                        options.Scope.Add("public_profile");
+                        options.Scope.Add("email");
+                    });
+            }
+        }
+
+        private static void AddGoogleProviders(AuthenticationBuilder authenticationBuilder, IEnumerable<ExternalProvider> externalProviders)
+        {
+            // TODO: Add code to handle failures
+            foreach (var externalProvider in externalProviders)
+            {
+                authenticationBuilder.AddGoogle(
+                    externalProvider.AuthenticationType,
+                    options =>
+                    {
+                        options.ClientId = externalProvider.ConsumerKey;
+                        options.ClientSecret = externalProvider.Secret;
+                        options.CallbackPath = externalProvider.Callback;
+                        options.Scope.Add("profile");
+                        options.Scope.Add("email");
+                    });
+            }
+        }
+
+        private static void AddTwitterProviders(AuthenticationBuilder authenticationBuilder, IEnumerable<ExternalProvider> externalProviders)
+        {
+            // TODO: Add code to handle failures
+            foreach (var externalProvider in externalProviders)
+            {
+                authenticationBuilder.AddTwitter(
+                    externalProvider.AuthenticationType,
+                    options =>
+                    {
+                        options.ConsumerKey = externalProvider.ConsumerKey;
+                        options.ConsumerSecret = externalProvider.Secret;
+                        options.CallbackPath = externalProvider.Callback;
+                    });
             }
         }
 

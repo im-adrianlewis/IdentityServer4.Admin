@@ -12,16 +12,18 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddAdminServices<TAdminDbContext>(
             this IServiceCollection services)
-            where TAdminDbContext : DbContext, IAdminPersistedGrantDbContext, IAdminConfigurationDbContext, IAdminLogDbContext
+            where TAdminDbContext : DbContext, IAdminPersistedGrantDbContext, IAdminConfigurationDbContext, IAdminLogDbContext, IAdminTenantConfigDbContext
         {
 
-            return services.AddAdminServices<TAdminDbContext, TAdminDbContext, TAdminDbContext>();
+            return services.AddAdminServices<TAdminDbContext, TAdminDbContext, TAdminDbContext, TAdminDbContext>();
         }
 
-        public static IServiceCollection AddAdminServices<TConfigurationDbContext, TPersistedGrantDbContext, TLogDbContext>(this IServiceCollection services)
+        public static IServiceCollection AddAdminServices<TConfigurationDbContext, TPersistedGrantDbContext, TLogDbContext, TTenantConfigDbContext>(this IServiceCollection services)
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
             where TLogDbContext : DbContext, IAdminLogDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
+
         {
             //Repositories
             services.AddTransient<IClientRepository, ClientRepository<TConfigurationDbContext>>();
@@ -29,6 +31,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IApiResourceRepository, ApiResourceRepository<TConfigurationDbContext>>();
             services.AddTransient<IPersistedGrantRepository, PersistedGrantRepository<TPersistedGrantDbContext>>();
             services.AddTransient<ILogRepository, LogRepository<TLogDbContext>>();
+            services.AddTransient<ITenantConfigurationRepository, TenantConfigurationRepository<TTenantConfigDbContext>>();
+            services.AddTransient<ITenantClaimTypeRepository, TenantClaimTypeRepository<TTenantConfigDbContext>>();
+            services.AddTransient<ITenantExternalProviderRepository, TenantExternalProviderRepository<TTenantConfigDbContext>>();
+            services.AddTransient<ITenantPasswordPolicyRepository, TenantPasswordPolicyRepository<TTenantConfigDbContext>>();
 
             //Services
             services.AddTransient<IClientService, ClientService>();
