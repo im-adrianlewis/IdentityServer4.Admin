@@ -134,7 +134,7 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                     {
                         UserName = user.Username,
                         Email = user.Email,
-                        EmailConfirmed = true
+                        EmailConfirmed = true,
                     };
 
                     // if there is no password we create user without password

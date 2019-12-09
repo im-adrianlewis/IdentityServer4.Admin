@@ -182,8 +182,18 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Services
 
             if (user.TenantId == null)
             {
+                if (string.IsNullOrEmpty(TenantId))
+                {
+                    TenantId = "Immediate";
+                }
+
                 ThrowIfTenantIdInvalid();
                 user.TenantId = TenantId;
+            }
+
+            if (string.IsNullOrEmpty(user.ScreenName))
+            {
+                user.ScreenName = Guid.NewGuid().ToString("N");
             }
 
             var now = DateTimeOffset.UtcNow;
