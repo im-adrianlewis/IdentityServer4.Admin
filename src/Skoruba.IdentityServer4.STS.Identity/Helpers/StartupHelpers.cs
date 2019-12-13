@@ -26,6 +26,7 @@ using Skoruba.IdentityServer4.STS.Identity.Helpers.Localization;
 using Skoruba.IdentityServer4.STS.Identity.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using System.Linq;
+using IdentityServer4.ResponseHandling;
 using Microsoft.Extensions.Hosting;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Entities;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Interfaces;
@@ -264,6 +265,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
                 .AddSingleton(registrationConfiguration)
                 .AddSingleton(loginConfiguration)
                 .AddScoped<UserResolver<TUserIdentity>>()
+                .AddScoped<IAuthorizeInteractionResponseGenerator, RegistrationCapableAuthorizationInteractionResponseGenerator>()
                 .AddIdentity<TUserIdentity, TUserIdentityRole>(options =>
                 {
                     options.User.RequireUniqueEmail = true;

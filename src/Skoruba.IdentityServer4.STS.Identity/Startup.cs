@@ -18,6 +18,7 @@ namespace Skoruba.IdentityServer4.STS.Identity
     public class Startup
     {
         public IConfiguration Configuration { get; }
+
         public IWebHostEnvironment Environment { get; }
 
         public Startup(IWebHostEnvironment environment, IConfiguration configuration)
@@ -48,14 +49,13 @@ namespace Skoruba.IdentityServer4.STS.Identity
             // Add authorization policies for MVC
             services.AddAuthorizationPolicies(rootConfiguration);
 
+            // Add support for dynamic cookie policy
             services.Configure<CookiePolicyOptions>(
                 options =>
                 {
                     options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                    options.OnAppendCookie =
-                        cookieContext => CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
-                    options.OnDeleteCookie =
-                        cookieContext => CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                    options.OnAppendCookie = context => CheckSameSite(context.Context, context.CookieOptions);
+                    options.OnDeleteCookie = context => CheckSameSite(context.Context, context.CookieOptions);
                 });
         }
 
