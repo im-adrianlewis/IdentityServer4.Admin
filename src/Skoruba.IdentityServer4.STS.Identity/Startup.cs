@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Net.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -45,6 +47,16 @@ namespace Skoruba.IdentityServer4.STS.Identity
 
             // Add authorization policies for MVC
             services.AddAuthorizationPolicies(rootConfiguration);
+
+            services.Configure<CookiePolicyOptions>(
+                options =>
+                {
+                    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                    options.OnAppendCookie =
+                        cookieContext => CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                    options.OnDeleteCookie =
+                        cookieContext => CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -56,6 +68,7 @@ namespace Skoruba.IdentityServer4.STS.Identity
 
             // Add custom security headers
             app.UseSecurityHeaders();
+            app.UseCookiePolicy();
 
             app.UseStaticFiles();
             app.UseIdentityServer();
@@ -72,6 +85,57 @@ namespace Skoruba.IdentityServer4.STS.Identity
             Configuration.GetSection(ConfigurationConsts.AdminConfigurationKey).Bind(rootConfiguration.AdminConfiguration);
             Configuration.GetSection(ConfigurationConsts.RegisterConfigurationKey).Bind(rootConfiguration.RegisterConfiguration);
             return rootConfiguration;
+        }
+
+        private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None)
+            {
+                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+                if (DisableSameSiteNone(userAgent))
+                {
+                    options.SameSite = SameSiteMode.Unspecified;
+                }
+            }
+        }
+
+        private static bool DisableSameSiteNone(string userAgent)
+        {
+            // Cover all iOS based browsers here
+            // - Safari on iOS 12 for iPhone, iPod Touch, iPad
+            // - WkWebView on iOS 12 for iPhone, iPod Touch, iPad
+            // - Chrome on iOS 12 for iPhone, iPod Touch, iPad
+            // All of which are broken by SameSite=None because they use iOS networking stack
+            if (userAgent.Contains("CPU iPhone OS 12") || userAgent.Contains("iPad: CPU OS 12"))
+            {
+                return true;
+            }
+
+            // Cover Mac OS X based browsers that use the Mac OS networking stack
+            // - Safari on Mac OS X
+            // This does not include:
+            // - Chrome on Mac OS X
+            if (userAgent.Contains("Macintosh; Intel Mac OS X 10_14") &&
+                userAgent.Contains("Version/") &&
+                userAgent.Contains("Safari"))
+            {
+                return true;
+            }
+
+            // Cover Chrome 50-69, because some versions are broken by SameSite=None,
+            // and none in this range require it.
+            // NOTE: This covers some pre-Chromium Edge versions,
+            // but pre-Chromium Edge does not require SameSite=None.
+            if (userAgent.Contains("Chrome/5") ||
+                userAgent.Contains("Chrome/6"))
+            {
+                return true;
+            }
+
+            // TODO: Validate whether we need to add additional user-agents here
+            //  as dictated by our supported browser matrix
+
+            return false;
         }
     }
 }

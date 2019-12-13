@@ -97,7 +97,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
         /// <param name="app"></param>
         public static void UseSecurityHeaders(this IApplicationBuilder app)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions()
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
@@ -267,6 +267,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
                 .AddIdentity<TUserIdentity, TUserIdentityRole>(options =>
                 {
                     options.User.RequireUniqueEmail = true;
+                    options.Lockout = new AdvancedLockoutOptions();
                 })
                 .AddUserManager<MultiTenantUserManager>()
                 .AddUserStore<MultiTenantUserStore<TUserIdentity, TUserIdentityRole, TIdentityDbContext, UserIdentityUserClaim, UserIdentityUserRole, UserIdentityUserLogin, UserIdentityUserToken, UserIdentityRoleClaim>>()
