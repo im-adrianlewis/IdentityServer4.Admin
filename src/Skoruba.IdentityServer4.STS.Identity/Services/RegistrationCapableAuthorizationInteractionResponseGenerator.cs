@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.ResponseHandling;
 using IdentityServer4.Services;
@@ -46,18 +43,5 @@ namespace Skoruba.IdentityServer4.STS.Identity.Services
 
             return Task.FromResult(new RegistrationInteractionResponse());
         }
-    }
-
-    public static class CreateOidcConstants
-    {
-        public static class PromptModes
-        {
-            public const string Create = "Create";
-        }
-    }
-
-    public class RegistrationInteractionResponse : InteractionResponse
-    {
-        public bool IsCreate { get; set; }
     }
 }

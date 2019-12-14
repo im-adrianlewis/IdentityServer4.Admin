@@ -265,6 +265,7 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
                 .AddSingleton(registrationConfiguration)
                 .AddSingleton(loginConfiguration)
                 .AddScoped<UserResolver<TUserIdentity>>()
+                .AddScoped<IAuthorizeResponseGenerator, RegistrationCapableAuthorizeResponseGenerator>()
                 .AddScoped<IAuthorizeInteractionResponseGenerator, RegistrationCapableAuthorizationInteractionResponseGenerator>()
                 .AddIdentity<TUserIdentity, TUserIdentityRole>(options =>
                 {
@@ -341,13 +342,31 @@ namespace Skoruba.IdentityServer4.STS.Identity.Helpers
             where TConfigurationDbContext : DbContext, IAdminConfigurationDbContext
             where TUserIdentity : class
         {
-            var builder = services.AddIdentityServer(options =>
-                {
-                    options.Events.RaiseErrorEvents = true;
-                    options.Events.RaiseInformationEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseSuccessEvents = true;
-                })
+            var builder = services
+                .AddIdentityServer(
+                    options =>
+                    {
+                        options.UserInteraction =
+                            new RegistrationCapableUserInteractionOptions
+                            {
+                                LoginUrl = "/account/login",
+                                LoginReturnUrlParameter = "returnUrl",
+                                LogoutUrl = "/account/logout",
+                                LogoutIdParameter = "logoutId",
+                                RegisterUrl = "/account/register",
+                                RegisterReturnUrlParameter = "returnUrl",
+                                ConsentUrl = "/consent",
+                                ConsentReturnUrlParameter = "returnUrl",
+                                DeviceVerificationUrl = "/device",
+                                DeviceVerificationUserCodeParameter = "user_code",
+                                ErrorUrl = "/home/error",
+                                ErrorIdParameter = "errorId"
+                            };
+                        options.Events.RaiseErrorEvents = true;
+                        options.Events.RaiseInformationEvents = true;
+                        options.Events.RaiseFailureEvents = true;
+                        options.Events.RaiseSuccessEvents = true;
+                    })
                 .AddConfigurationStore<TConfigurationDbContext>()
                 .AddOperationalStore<TPersistedGrantDbContext>()
                 .AddAspNetIdentity<TUserIdentity>();
