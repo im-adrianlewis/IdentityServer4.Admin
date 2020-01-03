@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["src/Im.Access.Admin.Api/Im.Access.Admin.Api.csproj", "src/Im.Access.Admin.Api/"]
 COPY ["src/Im.Access.Admin.BusinessLogic/Im.Access.Admin.BusinessLogic.csproj", "src/Im.Access.Admin.BusinessLogic/"]

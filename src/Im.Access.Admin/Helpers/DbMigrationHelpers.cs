@@ -12,6 +12,7 @@ using Skoruba.AuditLogging.EntityFramework.Entities;
 using Im.Access.Admin.Configuration;
 using Im.Access.Admin.Configuration.Interfaces;
 using Im.Access.EntityFramework.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Im.Access.Admin.Helpers
 {
@@ -28,7 +29,7 @@ namespace Im.Access.Admin.Helpers
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
             where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
             where TLogDbContext : DbContext, IAdminLogDbContext
-            where TAuditLogDbContext: DbContext, IAuditLoggingDbContext<AuditLog>
+            where TAuditLogDbContext : DbContext, IAuditLoggingDbContext<AuditLog>
             where TUser : IdentityUser, new()
             where TRole : IdentityRole, new()
         {
@@ -46,46 +47,23 @@ namespace Im.Access.Admin.Helpers
             where TConfigurationDbContext : DbContext
             where TTenantConfigDbContext : DbContext
             where TLogDbContext : DbContext
-            where TAuditLogDbContext: DbContext
+            where TAuditLogDbContext : DbContext
         {
             using (var scope = services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetRequiredService<TPersistedGrantDbContext>())
-                {
-                    await context.Database.MigrateAsync();
-                }
-
-                using (var context = scope.ServiceProvider.GetRequiredService<TIdentityDbContext>())
-                {
-                    await context.Database.MigrateAsync();
-                }
-
-                using (var context = scope.ServiceProvider.GetRequiredService<TConfigurationDbContext>())
-                {
-                    await context.Database.MigrateAsync();
-                }
-
-                using (var context = scope.ServiceProvider.GetRequiredService<TTenantConfigDbContext>())
-                {
-                    await context.Database.MigrateAsync();
-                }
-
-                using (var context = scope.ServiceProvider.GetRequiredService<TLogDbContext>())
-                {
-                    await context.Database.MigrateAsync();
-                }
-
-                using (var context = scope.ServiceProvider.GetRequiredService<TAuditLogDbContext>())
-                {
-                    await context.Database.MigrateAsync();
-                }
+                await MigrateDataContext<TPersistedGrantDbContext>(scope.ServiceProvider);
+                await MigrateDataContext<TIdentityDbContext>(scope.ServiceProvider);
+                await MigrateDataContext<TConfigurationDbContext>(scope.ServiceProvider);
+                await MigrateDataContext<TTenantConfigDbContext>(scope.ServiceProvider);
+                await MigrateDataContext<TLogDbContext>(scope.ServiceProvider);
+                await MigrateDataContext<TAuditLogDbContext>(scope.ServiceProvider);
             }
         }
 
         public static async Task EnsureSeedData<TIdentityServerDbContext, TUser, TRole>(IServiceProvider serviceProvider)
-        where TIdentityServerDbContext : DbContext, IAdminConfigurationDbContext
-        where TUser : IdentityUser, new()
-        where TRole : IdentityRole, new()
+            where TIdentityServerDbContext : DbContext, IAdminConfigurationDbContext
+            where TUser : IdentityUser, new()
+            where TRole : IdentityRole, new()
         {
             using (var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
@@ -96,6 +74,17 @@ namespace Im.Access.Admin.Helpers
 
                 await EnsureSeedIdentityServerData(context, rootConfiguration.IdentityServerDataConfiguration);
                 await EnsureSeedIdentityData(userManager, roleManager, rootConfiguration.IdentityDataConfiguration);
+            }
+        }
+
+        private static async Task MigrateDataContext<TDataContext>(IServiceProvider services)
+            where TDataContext : DbContext
+        {
+            var logger = services.GetService<ILogger<TDataContext>>();
+            logger?.LogInformation($"Applying {nameof(TDataContext)} migrations");
+            using (var context = services.GetRequiredService<TDataContext>())
+            {
+                await context.Database.MigrateAsync();
             }
         }
 

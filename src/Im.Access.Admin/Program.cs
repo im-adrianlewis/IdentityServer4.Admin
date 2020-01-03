@@ -22,7 +22,7 @@ namespace Im.Access.Admin
 
             var host = CreateHostBuilder(args).Build();
 
-            if (seed)
+            //if (seed)
             {
                 await DbMigrationHelpers.EnsureSeedData<IdentityServerConfigurationDbContext, AdminIdentityDbContext, IdentityServerPersistedGrantDbContext, AdminTenantConfigDbContext, AdminLogDbContext, AdminAuditLogDbContext, UserIdentity, UserIdentityRole>(host);
             }
