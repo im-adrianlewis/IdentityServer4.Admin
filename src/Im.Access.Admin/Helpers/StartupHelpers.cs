@@ -150,9 +150,9 @@ namespace Im.Access.Admin.Helpers
             var identityConnectionString = configuration.GetConnectionString(ConfigurationConsts.IdentityDbConnectionStringKey);
             var configurationConnectionString = configuration.GetConnectionString(ConfigurationConsts.ConfigurationDbConnectionStringKey);
             var persistedGrantsConnectionString = configuration.GetConnectionString(ConfigurationConsts.PersistedGrantDbConnectionStringKey);
+            var tenantConfigConnectionString = configuration.GetConnectionString(ConfigurationConsts.TenantConfigDbConnectionStringKey);
             var errorLoggingConnectionString = configuration.GetConnectionString(ConfigurationConsts.AdminLogDbConnectionStringKey);
             var auditLoggingConnectionString = configuration.GetConnectionString(ConfigurationConsts.AdminAuditLogDbConnectionStringKey);
-            var tenantConfigConnectionString = configuration.GetConnectionString(ConfigurationConsts.AdminTenantConfigDbConnectionStringKey);
 
             switch (databaseProvider.ProviderType)
             {

@@ -180,7 +180,7 @@ namespace Im.Access.Portal.Helpers
             var identityConnectionString = configuration.GetConnectionString(ConfigurationConsts.IdentityDbConnectionStringKey);
             var configurationConnectionString = configuration.GetConnectionString(ConfigurationConsts.ConfigurationDbConnectionStringKey);
             var persistedGrantsConnectionString = configuration.GetConnectionString(ConfigurationConsts.PersistedGrantDbConnectionStringKey);
-            var tenantConfigConnectionString = configuration.GetConnectionString(ConfigurationConsts.AdminTenantConfigDbConnectionStringKey);
+            var tenantConfigConnectionString = configuration.GetConnectionString(ConfigurationConsts.TenantConfigDbConnectionStringKey);
 
             switch (databaseProvider.ProviderType)
             {

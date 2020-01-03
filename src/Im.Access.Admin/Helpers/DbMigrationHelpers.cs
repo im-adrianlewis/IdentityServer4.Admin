@@ -22,10 +22,11 @@ namespace Im.Access.Admin.Helpers
         /// https://github.com/skoruba/IdentityServer4.Admin#ef-core--data-access
         /// </summary>
         /// <param name="host"></param>      
-        public static async Task EnsureSeedData<TIdentityServerDbContext, TIdentityDbContext, TPersistedGrantDbContext, TLogDbContext, TAuditLogDbContext, TUser, TRole>(IHost host)
+        public static async Task EnsureSeedData<TIdentityServerDbContext, TIdentityDbContext, TPersistedGrantDbContext, TTenantConfigDbContext, TLogDbContext, TAuditLogDbContext, TUser, TRole>(IHost host)
             where TIdentityServerDbContext : DbContext, IAdminConfigurationDbContext
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext, IAdminPersistedGrantDbContext
+            where TTenantConfigDbContext : DbContext, IAdminTenantConfigDbContext
             where TLogDbContext : DbContext, IAdminLogDbContext
             where TAuditLogDbContext: DbContext, IAuditLoggingDbContext<AuditLog>
             where TUser : IdentityUser, new()
@@ -34,15 +35,16 @@ namespace Im.Access.Admin.Helpers
             using (var serviceScope = host.Services.CreateScope())
             {
                 var services = serviceScope.ServiceProvider;
-                await EnsureDatabasesMigrated<TIdentityDbContext, TIdentityServerDbContext, TPersistedGrantDbContext, TLogDbContext, TAuditLogDbContext>(services);
+                await EnsureDatabasesMigrated<TIdentityDbContext, TIdentityServerDbContext, TPersistedGrantDbContext, TTenantConfigDbContext, TLogDbContext, TAuditLogDbContext>(services);
                 await EnsureSeedData<TIdentityServerDbContext, TUser, TRole>(services);
             }
         }
 
-        public static async Task EnsureDatabasesMigrated<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TLogDbContext, TAuditLogDbContext>(IServiceProvider services)
+        public static async Task EnsureDatabasesMigrated<TIdentityDbContext, TConfigurationDbContext, TPersistedGrantDbContext, TTenantConfigDbContext, TLogDbContext, TAuditLogDbContext>(IServiceProvider services)
             where TIdentityDbContext : DbContext
             where TPersistedGrantDbContext : DbContext
             where TConfigurationDbContext : DbContext
+            where TTenantConfigDbContext : DbContext
             where TLogDbContext : DbContext
             where TAuditLogDbContext: DbContext
         {
@@ -59,6 +61,11 @@ namespace Im.Access.Admin.Helpers
                 }
 
                 using (var context = scope.ServiceProvider.GetRequiredService<TConfigurationDbContext>())
+                {
+                    await context.Database.MigrateAsync();
+                }
+
+                using (var context = scope.ServiceProvider.GetRequiredService<TTenantConfigDbContext>())
                 {
                     await context.Database.MigrateAsync();
                 }

@@ -10,12 +10,12 @@
 
         public const string IdentityDbConnectionStringKey = "IdentityDbConnection";
 
+        public const string TenantConfigDbConnectionStringKey = "TenantConfigDbConnection";
+
         public const string ResourcesPath = "Resources";
 
         public const string AdminConfigurationKey = "AdminConfiguration";
 
         public const string RegisterConfigurationKey = "RegisterConfiguration";
-
-        public const string AdminTenantConfigDbConnectionStringKey = "TenantConfigDbConnection";
     }
 }
