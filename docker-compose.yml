@@ -1,14 +1,14 @@
 version: '3.4'
 
 services:
-  skoruba.identityserver4.admin:
-    image: ${DOCKER_REGISTRY-}skorubaidentityserver4admin
+  im.access.admin:
+    image: ${DOCKER_REGISTRY-}imaccessadmin
     ports:
       - 9000:80
     build:
       context: .
-      dockerfile: src/Skoruba.IdentityServer4.Admin/Dockerfile
-    container_name: skoruba-identityserver4-admin
+      dockerfile: src/Im.Access.Admin/Dockerfile
+    container_name: im-access-admin
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings__ConfigurationDbConnection=Server=db;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true"
@@ -27,16 +27,16 @@ services:
       - "IdentityServerData__Clients__0__AllowedCorsOrigins__0=http://127.0.0.1.xip.io:9000"
       - "IdentityServerData__Clients__1__RedirectUris__0=http://127.0.0.1.xip.io:5000/swagger/oauth2-redirect.html"
       - "Serilog__WriteTo__1__Args__connectionString=Server=db;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true"
-    command: dotnet Skoruba.IdentityServer4.Admin.dll /seed
+    command: dotnet Im.Access.Admin.dll /seed
     depends_on:
       - db
-      - skoruba.identityserver4.sts.identity
+      - im.access.portal
 
-  skoruba.identityserver4.admin.api:
-    image: ${DOCKER_REGISTRY-}skorubaidentityserver4adminapi
+  im.access.admin.api:
+    image: ${DOCKER_REGISTRY-}imaccessadminapi
     build:
       context: .
-      dockerfile: src/Skoruba.IdentityServer4.Admin.Api/Dockerfile
+      dockerfile: src/Im.Access.Admin.Api/Dockerfile
     ports:
       - 5000:80
     environment:
@@ -47,16 +47,16 @@ services:
       - "ConnectionStrings__IdentityDbConnection=Server=db;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true"
       - "ConnectionStrings__AdminLogDbConnection=Server=db;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true"
       - "ConnectionStrings__AdminAuditLogDbConnection=Server=db;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true"
-    container_name: skoruba-identityserver4-admin-api
+    container_name: im-access-admin-api
 
-  skoruba.identityserver4.sts.identity:
-    image: ${DOCKER_REGISTRY-}skorubaidentityserver4stsidentity
+  im.access.portal:
+    image: ${DOCKER_REGISTRY-}imaccessportal
     ports:
       - 80:80
     build:
       context: .
-      dockerfile: src/Skoruba.IdentityServer4.STS.Identity/Dockerfile
-    container_name: skoruba-identityserver4-sts-identity
+      dockerfile: src/Im.Access.Portal/Dockerfile
+    container_name: im-access-portal
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings__ConfigurationDbConnection=Server=db;Database=IdentityServer4Admin;User Id=sa;Password=${DB_PASSWORD:-Password_123};MultipleActiveResultSets=true"
@@ -73,7 +73,7 @@ services:
     image: "mcr.microsoft.com/mssql/server"
     ports:
       - 1433:1433
-    container_name: skoruba-identityserver4-db
+    container_name: im-access-db
     environment:
       SA_PASSWORD: "${DB_PASSWORD:-Password_123}"
       ACCEPT_EULA: "Y"

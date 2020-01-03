@@ -1,0 +1,7 @@
+﻿namespace Im.Access.Admin.BusinessLogic.Identity.Dtos.Identity.Interfaces
+{
+    public interface IBaseUserChangePasswordDto
+    {
+        object UserId { get; }
+    }
+}

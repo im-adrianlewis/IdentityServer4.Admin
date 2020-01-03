@@ -1,0 +1,46 @@
+﻿using System.Net;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Im.Access.Admin.Configuration.Constants;
+using Im.Access.Admin.IntegrationTests.Tests.Base;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Xunit;
+
+namespace Im.Access.Admin.IntegrationTests.Tests
+{
+    public class LogControllerTests : BaseClassFixture
+    {
+        public LogControllerTests(WebApplicationFactory<Startup> factory) : base(factory)
+        {
+        }
+
+        [Fact]
+        public async Task ReturnRedirectInErrorsLogWithoutAdminRole()
+        {
+            //Remove
+            Client.DefaultRequestHeaders.Clear();
+
+            // Act
+            var response = await Client.GetAsync("/log/errorslog");
+
+            // Assert           
+            response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+
+            //The redirect to login
+            response.Headers.Location.ToString().Should().Contain(AuthenticationConsts.AccountLoginPage);
+        }
+
+        [Fact]
+        public async Task ReturnSuccessInErrorsLogWithAdminRole()
+        {
+            SetupAdminClaimsViaHeaders();
+
+            // Act
+            var response = await Client.GetAsync("/log/errorslog");
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+    }
+}
