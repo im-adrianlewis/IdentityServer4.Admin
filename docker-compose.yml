@@ -6,8 +6,8 @@ services:
     ports:
       - 9000:80
     build:
-      context: .
-      dockerfile: src/Im.Access.Admin/Dockerfile
+      context: src
+      dockerfile: Im.Access.Admin/Dockerfile
     container_name: im-access-admin
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -38,8 +38,8 @@ services:
     ports:
       - 8000:80
     build:
-      context: .
-      dockerfile: src/Im.Access.Admin.Api/Dockerfile
+      context: src
+      dockerfile: Im.Access.Admin.Api/Dockerfile
     container_name: im-access-admin-api
     environment:
       - "AdminApiConfiguration__RequireHttpsMetadata=false"
@@ -59,8 +59,8 @@ services:
     ports:
       - 7000:80
     build:
-      context: .
-      dockerfile: src/Im.Access.Portal/Dockerfile
+      context: src
+      dockerfile: Im.Access.Portal/Dockerfile
     container_name: im-access-portal
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

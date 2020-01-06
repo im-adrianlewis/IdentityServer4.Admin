@@ -4,17 +4,17 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["src/Im.Access.Admin.Api/Im.Access.Admin.Api.csproj", "src/Im.Access.Admin.Api/"]
-COPY ["src/Im.Access.Admin.BusinessLogic/Im.Access.Admin.BusinessLogic.csproj", "src/Im.Access.Admin.BusinessLogic/"]
-COPY ["src/Im.Access.EntityFramework/Im.Access.EntityFramework.csproj", "src/Im.Access.EntityFramework/"]
-COPY ["src/Im.Access.EntityFramework.Extensions/Im.Access.EntityFramework.Extensions.csproj", "src/Im.Access.EntityFramework.Extensions/"]
-COPY ["src/Im.Access.Admin.BusinessLogic.Shared/Im.Access.Admin.BusinessLogic.Shared.csproj", "src/Im.Access.Admin.BusinessLogic.Shared/"]
-COPY ["src/Im.Access.Admin.BusinessLogic.Identity/Im.Access.Admin.BusinessLogic.Identity.csproj", "src/Im.Access.Admin.BusinessLogic.Identity/"]
-COPY ["src/Im.Access.EntityFramework.Identity/Im.Access.EntityFramework.Identity.csproj", "src/Im.Access.EntityFramework.Identity/"]
-COPY ["src/Im.Access.EntityFramework.Shared/Im.Access.EntityFramework.Shared.csproj", "src/Im.Access.EntityFramework.Shared/"]
+COPY ["Im.Access.Admin.Api/Im.Access.Admin.Api.csproj", "src/Im.Access.Admin.Api/"]
+COPY ["Im.Access.Admin.BusinessLogic/Im.Access.Admin.BusinessLogic.csproj", "src/Im.Access.Admin.BusinessLogic/"]
+COPY ["Im.Access.EntityFramework/Im.Access.EntityFramework.csproj", "src/Im.Access.EntityFramework/"]
+COPY ["Im.Access.EntityFramework.Extensions/Im.Access.EntityFramework.Extensions.csproj", "src/Im.Access.EntityFramework.Extensions/"]
+COPY ["Im.Access.Admin.BusinessLogic.Shared/Im.Access.Admin.BusinessLogic.Shared.csproj", "src/Im.Access.Admin.BusinessLogic.Shared/"]
+COPY ["Im.Access.Admin.BusinessLogic.Identity/Im.Access.Admin.BusinessLogic.Identity.csproj", "src/Im.Access.Admin.BusinessLogic.Identity/"]
+COPY ["Im.Access.EntityFramework.Identity/Im.Access.EntityFramework.Identity.csproj", "src/Im.Access.EntityFramework.Identity/"]
+COPY ["Im.Access.EntityFramework.Shared/Im.Access.EntityFramework.Shared.csproj", "src/Im.Access.EntityFramework.Shared/"]
 RUN dotnet restore "src/Im.Access.Admin.Api/Im.Access.Admin.Api.csproj"
 COPY . .
-WORKDIR "/src/src/Im.Access.Admin.Api"
+WORKDIR "/src/Im.Access.Admin.Api"
 RUN dotnet build "Im.Access.Admin.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
